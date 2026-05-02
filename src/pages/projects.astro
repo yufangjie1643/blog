@@ -1,0 +1,163 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+interface Project {
+  name: string;
+  description: string;
+  url: string;
+  lang: string;
+  tags: string[];
+}
+
+const projects: Project[] = [
+  {
+    name: 'Voxel-ACDM',
+    description: '基于体素的各向异性连续损伤力学（CDM）求解器，用于复合材料。支持谱有限元（Spectral FEM）和多尺度渐进失效模拟。',
+    url: 'https://github.com/yufangjie1643/Voxel-ACDM',
+    lang: 'Python',
+    tags: ['复合材料', '损伤力学', '谱有限元', '多尺度分析']
+  },
+  {
+    name: 'bianpokangzheng',
+    description: '基于二维有限元模态叠加法的边坡地震响应分析桌面工具。用于评估边坡在地震作用下的动力稳定性。',
+    url: 'https://github.com/yufangjie1643/bianpokangzheng',
+    lang: 'Python',
+    tags: ['边坡工程', '地震响应', '模态叠加法', '有限元']
+  },
+  {
+    name: 'pytexgen',
+    description: 'TexGen 的 Python 绑定，用于纺织复合材料几何建模。支持 2D/3D 编织结构建模、体素/四面体网格生成，导出到 Abaqus/ANSYS。',
+    url: 'https://github.com/yufangjie1643/pytexgen',
+    lang: 'C++ / Python',
+    tags: ['纺织复合材料', '几何建模', '网格生成', 'Abaqus']
+  },
+  {
+    name: 'SpecTrack',
+    description: '基于频谱分析的目标跟踪算法研究。',
+    url: 'https://github.com/yufangjie1643/SpecTrack',
+    lang: 'Python',
+    tags: ['目标跟踪', '计算机视觉', '深度学习']
+  },
+  {
+    name: 'SUTrack-moe',
+    description: '混合专家模型（MoE）在目标跟踪中的应用探索。',
+    url: 'https://github.com/yufangjie1643/SUTrack-moe',
+    lang: 'Python',
+    tags: ['目标跟踪', 'MoE', '深度学习']
+  },
+  {
+    name: 'Y-net',
+    description: '目标跟踪网络架构研究。',
+    url: 'https://github.com/yufangjie1643/Y-net',
+    lang: 'Python',
+    tags: ['目标跟踪', '神经网络']
+  },
+];
+---
+
+<Layout title="项目">
+  <h1>开源项目</h1>
+  <p class="intro">以下是我的部分研究工作与开源项目，主要涉及计算力学、复合材料建模和计算机视觉。</p>
+
+  <div class="project-grid">
+    {projects.map((project) => (
+      <a href={project.url} target="_blank" rel="noopener" class="project-card">
+        <div class="card-header">
+          <h2>{project.name}</h2>
+          <span class="lang">{project.lang}</span>
+        </div>
+        <p class="description">{project.description}</p>
+        <div class="tags">
+          {project.tags.map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      </a>
+    ))}
+  </div>
+</Layout>
+
+<style>
+  h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .intro {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .project-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .project-card {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    background: var(--bg-secondary);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+
+  .project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 86, 179, 0.1);
+    border-color: var(--accent);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.15rem;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  .lang {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: var(--bg);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .description {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    opacity: 0.9;
+  }
+</style>

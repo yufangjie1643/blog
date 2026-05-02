@@ -9,12 +9,21 @@ const posts = (await getCollection('blog')).sort(
 
 <Layout title="首页">
   <section class="hero">
-    <h1>欢迎来到我的博客</h1>
-    <p>用 Astro 搭建的现代化个人博客，极速、简洁、优雅。</p>
+    <div class="avatar">🔬</div>
+    <h1>yufangjie1643</h1>
+    <p class="tagline">西南交通大学 · 力学与航空航天学院</p>
+    <p class="desc">计算力学 | 复合材料损伤力学 | 纺织结构建模 | 边坡抗震分析</p>
+    <div class="actions">
+      <a href="/projects" class="btn primary">查看项目</a>
+      <a href="/blog" class="btn">阅读文章</a>
+    </div>
   </section>
 
   <section class="posts">
-    <h2>最新文章</h2>
+    <div class="section-header">
+      <h2>最新文章</h2>
+      <a href="/blog" class="more">查看全部 →</a>
+    </div>
     <ul>
       {posts.map((post) => (
         <li>
@@ -33,33 +42,93 @@ const posts = (await getCollection('blog')).sort(
 <style>
   .hero {
     text-align: center;
-    padding: 3rem 0;
+    padding: 3rem 0 2rem;
+  }
+
+  .avatar {
+    font-size: 4rem;
+    margin-bottom: 1rem;
   }
 
   .hero h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
   }
 
-  .hero p {
-    color: var(--text-secondary);
+  .tagline {
+    color: var(--accent);
+    font-weight: 500;
     font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .desc {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .btn.primary:hover {
+    background: var(--accent-light);
+    border-color: var(--accent-light);
   }
 
   .posts {
     margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
   }
 
-  .posts h2 {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5rem;
+  }
+
+  .section-header h2 {
     font-size: 1.25rem;
     color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  }
+
+  .more {
+    font-size: 0.9rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .more:hover {
+    text-decoration: underline;
   }
 
   .posts ul {

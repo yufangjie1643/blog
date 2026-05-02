@@ -1,25 +1,42 @@
 ---
-title: '暗色模式与响应式设计'
-description: '使用 CSS 变量和媒体查询实现现代化的主题切换。'
+title: 'TexGen Python 绑定与纺织复合材料建模'
+description: '介绍 pytexgen 项目：TexGen 的 Python 封装，用于纺织结构几何建模与有限元前处理。'
 pubDate: '2025-05-03'
 ---
 
-这个博客使用了 CSS 变量和 `prefers-color-scheme` 媒体查询，自动适配系统的暗色/亮色模式。
+纺织复合材料（Textile Composites）因其优异的损伤容限和可设计性，在航空航天领域应用广泛。我开发了 **pytexgen** —— TexGen 几何建模引擎的 Python 绑定，用于纺织结构的高效建模与有限元前处理。
 
-## 实现原理
+## 功能特性
 
-```css
-:root {
-  --bg: #ffffff;
-  --text: #0f172a;
-}
+### 1. 几何建模
+- **2D/3D 编织**：平纹、斜纹、缎纹及多层角联锁结构
+- **参数化纱线路径**：基于样条曲线定义纱线中心线
+- **横截面控制**：椭圆、矩形、透镜形等可定制截面
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f172a;
-    --text: #f8fafc;
-  }
-}
+### 2. 网格生成
+- **体素网格（Voxel Mesh）**：均匀体素化，适合谱方法或像素/体素型求解器
+- **四面体网格（Tet Mesh）**：通过 CGAL 生成高质量非结构化网格
+- **局部加密**：纱线交织区自动网格细化
+
+### 3. 有限元接口
+- **Abaqus**：生成 `.inp` 文件，包含部件、装配体、材料属性与边界条件模板
+- **ANSYS**：导出 `.cdb` 网格文件
+
+## 使用示例
+
+```python
+from pytexgen import Weave, Textile, MeshExporter
+
+# 创建平纹织物
+weave = Weave.plain_wearn(warp_count=10, weft_count=10)
+textile = Textile.from_weave(weave, yarn_width=2.0, yarn_thickness=0.5)
+
+# 生成体素网格
+voxel_mesh = textile.voxelize(resolution=0.1)
+
+# 导出到 Abaqus
+exporter = MeshExporter(voxel_mesh)
+exporter.to_abaqus("plain_weave.inp")
 ```
 
-无需 JavaScript，纯 CSS 实现，性能最好。
+项目地址：[github.com/yufangjie1643/pytexgen](https://github.com/yufangjie1643/pytexgen)

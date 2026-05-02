@@ -3,38 +3,130 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="关于">
-  <h1>关于我</h1>
-  <p>这是一个用 Astro 搭建的个人博客示例。</p>
-  <p>Astro 是一个现代化的静态站点生成器，专为内容驱动型网站设计。它的核心优势包括：</p>
-  <ul>
-    <li><strong>零 JS 默认</strong>：页面只输出纯 HTML，加载速度极快</li>
-    <li><strong>岛屿架构</strong>：只在需要的地方加载 JavaScript</li>
-    <li><strong>内容集合</strong>：内置 TypeScript 类型安全的内容管理</li>
-    <li><strong>前端框架无关</strong>：支持 React、Vue、Svelte 等组件</li>
-  </ul>
+  <section class="profile">
+    <div class="avatar">🔬</div>
+    <h1>关于我</h1>
+    <p class="subtitle">力学研究生 · 计算力学与复合材料方向</p>
+  </section>
+
+  <section class="info">
+    <h2>教育背景</h2>
+    <div class="card">
+      <h3>西南交通大学</h3>
+      <p>力学与航空航天学院 · 力学专业 · 硕士研究生在读</p>
+      <p class="tags">
+        <span>计算力学</span>
+        <span>有限元方法</span>
+        <span>复合材料</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="research">
+    <h2>研究方向</h2>
+    <ul>
+      <li><strong>复合材料损伤力学</strong>：基于体素（Voxel）的各向异性连续损伤力学（CDM）建模，谱有限元方法，多尺度渐进失效分析</li>
+      <li><strong>纺织复合材料建模</strong>：TexGen 几何建模，2D/3D 编织结构，体素/四面体网格生成，Abaqus/ANSYS 有限元分析接口</li>
+      <li><strong>边坡地震响应分析</strong>：基于二维有限元模态叠加法的边坡抗震性能评估</li>
+      <li><strong>计算机视觉</strong>：目标跟踪算法（Siamese Network、Transformer-based Trackers）</li>
+    </ul>
+  </section>
+
+  <section class="contact">
+    <h2>联系方式</h2>
+    <ul>
+      <li>GitHub：<a href="https://github.com/yufangjie1643" target="_blank" rel="noopener">@yufangjie1643</a></li>
+      <li>学校：西南交通大学 · 力学与航空航天学院</li>
+    </ul>
+  </section>
 </Layout>
 
 <style>
-  h1 {
-    margin-bottom: 1.5rem;
+  .profile {
+    text-align: center;
+    padding: 2rem 0;
   }
 
-  p {
+  .avatar {
+    font-size: 4rem;
     margin-bottom: 1rem;
-    font-size: 1.05rem;
+  }
+
+  .profile h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+
+  section {
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .tags span {
+    background: var(--accent);
+    color: white;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
   }
 
   ul {
     padding-left: 1.5rem;
-    margin-bottom: 1rem;
   }
 
   li {
     margin-bottom: 0.75rem;
-    font-size: 1.05rem;
+    font-size: 1rem;
+    line-height: 1.7;
   }
 
   strong {
     color: var(--accent);
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 </style>

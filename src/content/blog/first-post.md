@@ -1,24 +1,33 @@
 ---
-title: '我的第一篇博客'
-description: '欢迎来到这个用 Astro 搭建的现代化博客。'
+title: 'Voxel-ACDM：复合材料损伤力学求解器'
+description: '介绍基于体素的各向异性连续损伤力学求解器，用于复合材料多尺度渐进失效分析。'
 pubDate: '2025-05-01'
 ---
 
-这是使用 **Astro 内容集合** 写的第一篇博客文章。
+Voxel-ACDM 是我开发的一个基于体素的各向异性连续损伤力学（Anisotropic Continuum Damage Mechanics, ACDM）求解器，专注于复合材料的多尺度渐进失效模拟。
 
-## 为什么选择 Astro？
+## 核心功能
 
-Astro 是目前最适合构建内容型网站的框架之一：
+- **体素化建模**：将复合材料细观结构离散为体素网格，直接基于 CT 扫描或人工生成的几何模型进行分析
+- **谱有限元方法（Spectral FEM）**：利用 FFT 加速的谱方法高效求解周期性边界条件下的力学响应
+- **各向异性损伤演化**：针对纤维、基体及界面相分别建立损伤准则与演化律
+- **多尺度耦合**：从细观 Representative Volume Element（RVE）到宏观结构的多尺度传递
 
-- **极速性能**：默认零 JavaScript，页面加载飞快
-- **开发者体验**：内置 TypeScript、Markdown、内容集合
-- **灵活组合**：可以在同一个项目中混合使用 React、Vue、Svelte 组件
+## 技术栈
 
-## 代码示例
+```python
+import numpy as np
+from voxel_acdm import RVE, SpectralSolver
 
-```javascript
-const greeting = "Hello, Astro!";
-console.log(greeting);
+# 创建体素模型
+rve = RVE.from_voxels(voxel_data, resolution=1.0)
+
+# 定义载荷工况
+loading = {'exx': 0.01, 'eyy': 0.0, 'ezz': 0.0}
+
+# 运行谱有限元求解
+solver = SpectralSolver(rve)
+result = solver.solve(loading, damage_model='anisotropic_cdm')
 ```
 
-希望你喜欢这个博客！
+项目地址：[github.com/yufangjie1643/Voxel-ACDM](https://github.com/yufangjie1643/Voxel-ACDM)
