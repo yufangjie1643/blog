@@ -1,0 +1,99 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<Layout title="首页">
+  <section class="hero">
+    <h1>欢迎来到我的博客</h1>
+    <p>用 Astro 搭建的现代化个人博客，极速、简洁、优雅。</p>
+  </section>
+
+  <section class="posts">
+    <h2>最新文章</h2>
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.slug}/`}>
+            <span class="title">{post.data.title}</span>
+            <span class="date">
+              {post.data.pubDate.toLocaleDateString('zh-CN')}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 3rem 0;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+
+  .posts {
+    margin-top: 2rem;
+  }
+
+  .posts h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .posts ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .posts li {
+    margin-bottom: 0.75rem;
+  }
+
+  .posts a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+
+  .posts a:hover {
+    background: var(--bg-secondary);
+  }
+
+  .posts .title {
+    font-weight: 500;
+  }
+
+  .posts .date {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    margin-left: 1rem;
+  }
+</style>

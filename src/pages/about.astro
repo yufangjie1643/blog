@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="关于">
+  <h1>关于我</h1>
+  <p>这是一个用 Astro 搭建的个人博客示例。</p>
+  <p>Astro 是一个现代化的静态站点生成器，专为内容驱动型网站设计。它的核心优势包括：</p>
+  <ul>
+    <li><strong>零 JS 默认</strong>：页面只输出纯 HTML，加载速度极快</li>
+    <li><strong>岛屿架构</strong>：只在需要的地方加载 JavaScript</li>
+    <li><strong>内容集合</strong>：内置 TypeScript 类型安全的内容管理</li>
+    <li><strong>前端框架无关</strong>：支持 React、Vue、Svelte 等组件</li>
+  </ul>
+</Layout>
+
+<style>
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+
+  p {
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+  }
+
+  ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 0.75rem;
+    font-size: 1.05rem;
+  }
+
+  strong {
+    color: var(--accent);
+  }
+</style>
