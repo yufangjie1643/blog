@@ -1,10 +1,15 @@
 ---
-title: 'TexGen Python 绑定与纺织复合材料建模'
+title: 'TexGen Python 绑定与编织复合材料建模'
 description: '介绍 pytexgen 项目：TexGen 的 Python 封装，用于纺织结构几何建模与有限元前处理。'
-pubDate: '2025-05-03'
+pubDate: 1746234000
+slug: 'texgen-python-binding'
+aliases: ['third-post']
+category: '项目笔记'
+series: '开源项目'
+tags: ['编织复合材料', '几何建模', 'TexGen', 'Abaqus']
 ---
 
-纺织复合材料（Textile Composites）因其优异的损伤容限和可设计性，在航空航天领域应用广泛。我开发了 **pytexgen** —— TexGen 几何建模引擎的 Python 绑定，用于纺织结构的高效建模与有限元前处理。
+编织复合材料（Textile Composites）因其优异的损伤容限和可设计性，在航空航天领域应用广泛。我开发了 **pytexgen** —— TexGen 几何建模引擎的 Python 绑定，用于纺织结构的高效建模与有限元前处理。
 
 ## 功能特性
 

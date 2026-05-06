@@ -1,26 +1,142 @@
 ---
 import Layout from './Layout.astro';
 import type { CollectionEntry } from 'astro:content';
+import { getFallbackTime, getTagHref, getTimestamp } from '../lib/content';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const {
+  title,
+  seoTitle,
+  description,
+  pubDate,
+  updatedDate,
+  sourceCheckedAt,
+  heroImage,
+  heroImageAlt,
+  heroImageCaption,
+  imageCredit,
+  ogImage,
+  canonicalUrl,
+  lang,
+  tags = [],
+  category,
+  series,
+  paper,
+} = Astro.props;
+const dailyPaperTag = '每日论文精读';
+const paperLinks = paper
+  ? [
+      paper.doi && { label: 'DOI', href: `https://doi.org/${paper.doi}` },
+      paper.arxiv && { label: 'arXiv', href: `https://arxiv.org/abs/${paper.arxiv.replace(/^arXiv:/i, '')}` },
+      paper.url && { label: 'Source', href: paper.url },
+      paper.pdfUrl && { label: 'PDF', href: paper.pdfUrl, download: paper.pdfFile ?? true },
+      paper.codeUrl && { label: 'Code', href: paper.codeUrl },
+      paper.datasetUrl && { label: 'Data', href: paper.datasetUrl },
+    ].filter((link): link is { label: string; href: string; download?: string | boolean } => Boolean(link))
+  : [];
+const paperVenue = paper ? [paper.venue, paper.year].filter(Boolean).join(' · ') : '';
 ---
 
-<Layout title={title} description={description}>
-  <article>
-    {heroImage && <img src={heroImage} alt={title} class="hero-image" />}
-    <div class="meta">
-      <time datetime={pubDate.toISOString()}>
-        {pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
-      </time>
-      {updatedDate && (
-        <span class="updated">
-          (更新于 {updatedDate.toLocaleDateString('zh-CN')})
-        </span>
-      )}
-    </div>
-    <h1>{title}</h1>
+<Layout
+  title={title}
+  seoTitle={seoTitle}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  ogImage={ogImage}
+  lang={lang}
+  ogType="article"
+>
+  <article class="post-shell">
+    <a href="/blog" class="back-link">返回文章列表</a>
+    <header class="post-header">
+      {
+        heroImage && (
+          <figure class="hero-media">
+            <img src={heroImage} alt={heroImageAlt ?? title} class="hero-image" loading="eager" />
+            {(heroImageCaption || imageCredit) && (
+              <figcaption>
+                {heroImageCaption && <span>{heroImageCaption}</span>}
+                {imageCredit && <span>{imageCredit}</span>}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
+      <div class="meta-line">
+        <time datetime={pubDate.toISOString()} data-timestamp={getTimestamp(pubDate)}>
+          {getFallbackTime(pubDate)}
+        </time>
+        {category && <span>{category}</span>}
+        {series && <span>{series}</span>}
+        {
+          updatedDate && (
+            <span>
+              更新于
+              <time datetime={updatedDate.toISOString()} data-timestamp={getTimestamp(updatedDate)}>
+                {getFallbackTime(updatedDate)}
+              </time>
+            </span>
+          )
+        }
+      </div>
+      <h1>{title}</h1>
+      {description && <p class="post-description">{description}</p>}
+      {
+        paper && (
+          <aside class="paper-meta-card" aria-label="论文信息">
+            <div class="paper-meta-main">
+              <span>Paper</span>
+              <strong>{paper.title}</strong>
+              <p>{paper.authors.join(', ')}</p>
+            </div>
+            <dl>
+              {paperVenue && (
+                <div>
+                  <dt>Venue</dt>
+                  <dd>{paperVenue}</dd>
+                </div>
+              )}
+              {sourceCheckedAt && (
+                <div>
+                  <dt>Checked</dt>
+                  <dd>
+                    <time datetime={sourceCheckedAt.toISOString()} data-timestamp={getTimestamp(sourceCheckedAt)}>
+                      {getFallbackTime(sourceCheckedAt)}
+                    </time>
+                  </dd>
+                </div>
+              )}
+            </dl>
+            {paperLinks.length > 0 && (
+              <div class="paper-links" aria-label="论文链接">
+                {paperLinks.map((link) => (
+                  <a
+                    href={link.href}
+                    target={link.download ? undefined : '_blank'}
+                    rel={link.download ? undefined : 'noopener'}
+                    download={link.download}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </aside>
+        )
+      }
+      {
+        tags.length > 0 && (
+          <div class="tag-list" aria-label="文章标签">
+            {tags.map((tag) => (
+              <a href={getTagHref(tag)} class:list={['tag-chip', { featured: tag === dailyPaperTag }]}>
+                {tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </header>
     <div class="content">
       <slot />
     </div>
@@ -28,81 +144,368 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 </Layout>
 
 <style>
-  .hero-image {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
+  .post-shell {
+    width: min(100%, var(--prose));
+    margin: 0 auto;
+    min-width: 0;
   }
 
-  .meta {
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.35rem;
+    margin-bottom: 1.4rem;
     color: var(--text-secondary);
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
+    text-decoration: none;
+    font-size: 0.92rem;
   }
 
-  .updated {
-    margin-left: 0.5rem;
-  }
-
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    line-height: 1.3;
-  }
-
-  .content {
-    font-size: 1.05rem;
-    line-height: 1.8;
-  }
-
-  .content :global(h2) {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+  .back-link:hover {
     color: var(--accent);
   }
 
-  .content :global(p) {
-    margin-bottom: 1.25rem;
+  .post-header {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid var(--border);
   }
 
-  .content :global(ul, ol) {
-    margin-bottom: 1.25rem;
-    padding-left: 1.5rem;
+  .hero-media {
+    margin: 0;
+  }
+
+  .hero-image {
+    width: 100%;
+    max-height: 430px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .hero-media figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.5rem;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .post-header h1 {
+    font-family: ui-serif, "Songti SC", "Noto Serif CJK SC", Georgia, serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    line-height: 1.08;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .post-description {
+    color: var(--text-secondary);
+    font-size: clamp(1rem, 2vw, 1.16rem);
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  .paper-meta-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(12rem, 0.8fr);
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-left: 0.35rem solid var(--accent-2);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(120deg, rgba(255, 255, 255, 0.42), transparent 64%),
+      var(--surface);
+  }
+
+  .paper-meta-main {
+    min-width: 0;
+  }
+
+  .paper-meta-main > span,
+  .paper-meta-card dt {
+    color: var(--text-soft);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .paper-meta-main strong {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--text);
+    font-size: 1.02rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .paper-meta-main p {
+    margin-top: 0.38rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  .paper-meta-card dl {
+    display: grid;
+    align-content: start;
+    gap: 0.7rem;
+    margin: 0;
+  }
+
+  .paper-meta-card dd {
+    margin: 0.18rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .paper-links {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .paper-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.28rem 0.65rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--bg-elevated) 72%, transparent);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+
+  .paper-links a:hover {
+    border-color: var(--accent);
+    background: var(--surface-strong);
+  }
+
+  .content {
+    min-width: 0;
+    color: var(--text);
+    font-size: 1.04rem;
+    line-height: 1.88;
+  }
+
+  .content :global(*) {
+    min-width: 0;
+  }
+
+  .content :global(h2),
+  .content :global(h3),
+  .content :global(h4) {
+    color: var(--text);
+    line-height: 1.28;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .content :global(h2) {
+    margin-top: 2.8rem;
+    margin-bottom: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border);
+    font-size: clamp(1.45rem, 3vw, 2rem);
+  }
+
+  .content :global(h3) {
+    margin-top: 2rem;
+    margin-bottom: 0.65rem;
+    color: var(--accent);
+    font-size: clamp(1.16rem, 2.4vw, 1.42rem);
+  }
+
+  .content :global(p) {
+    margin-bottom: 1.22rem;
+    overflow-wrap: anywhere;
+  }
+
+  .content :global(a) {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .content :global(ul),
+  .content :global(ol) {
+    margin: 0 0 1.35rem;
+    padding-left: 1.35rem;
   }
 
   .content :global(li) {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
+    padding-left: 0.2rem;
+    overflow-wrap: anywhere;
+  }
+
+  .content :global(strong) {
+    color: var(--text);
   }
 
   .content :global(code) {
-    background: var(--bg-secondary);
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
+    padding: 0.16rem 0.38rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--bg-elevated) 78%, transparent);
+    color: var(--accent-3);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.9em;
-    font-family: 'Fira Code', monospace;
+    overflow-wrap: anywhere;
   }
 
   .content :global(pre) {
-    background: var(--bg-secondary);
+    max-width: 100%;
+    margin: 1.5rem 0;
     padding: 1rem;
-    border-radius: 8px;
     overflow-x: auto;
-    margin-bottom: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent),
+      color-mix(in srgb, var(--text) 88%, black);
+    box-shadow: var(--shadow-soft);
+    -webkit-overflow-scrolling: touch;
   }
 
   .content :global(pre code) {
-    background: none;
+    border: 0;
     padding: 0;
+    background: none;
+    color: #f6efe2;
+    overflow-wrap: normal;
   }
 
   .content :global(blockquote) {
-    border-left: 4px solid var(--accent);
-    padding-left: 1rem;
-    margin: 1.5rem 0;
+    margin: 1.6rem 0;
+    padding: 1rem 1.1rem;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
     color: var(--text-secondary);
-    font-style: italic;
+    font-family: ui-serif, "Songti SC", Georgia, serif;
+  }
+
+  .content :global(table) {
+    display: block;
+    width: 100%;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+
+  .content :global(th),
+  .content :global(td) {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border);
+  }
+
+  .content :global(th) {
+    background: var(--surface);
+    text-align: left;
+  }
+
+  .content :global(hr) {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .content :global(.paper-figure) {
+    margin: 1.6rem 0;
+    padding: clamp(0.9rem, 3vw, 1.2rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.42), transparent),
+      color-mix(in srgb, var(--surface) 84%, transparent);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+  }
+
+  .content :global(.paper-figure svg),
+  .content :global(.paper-figure img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .content :global(.paper-figure figcaption) {
+    margin-top: 0.8rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .content :global(.paper-grid) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1.4rem 0;
+  }
+
+  .content :global(.paper-tile) {
+    min-width: 0;
+    padding: 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+  }
+
+  .content :global(.paper-tile strong) {
+    display: block;
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+
+  .content :global(.paper-tile span) {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 640px) {
+    .post-shell {
+      width: 100%;
+    }
+
+    .post-header {
+      gap: 0.75rem;
+    }
+
+    .paper-meta-card {
+      grid-template-columns: 1fr;
+    }
+
+    .content {
+      font-size: 1rem;
+      line-height: 1.78;
+    }
+
+    .content :global(pre) {
+      padding: 0.85rem;
+    }
+
+    .content :global(.paper-grid) {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -1,70 +1,191 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { dailyPaperTag, tagRegistry } from '../../data/tags';
+import {
+  getBlogHref,
+  getFallbackTime,
+  getPostTags,
+  getTagHref,
+  getTimestamp,
+  isPublished,
+  sortPosts,
+} from '../../lib/content';
 
-const posts = (await getCollection('blog')).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const posts = sortPosts((await getCollection('blog')).filter(isPublished));
+
+const featuredTags = tagRegistry.map((tag) => tag.name);
+const tagCounts = new Map<string, number>();
+
+for (const post of posts) {
+  for (const tag of post.data.tags ?? []) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+
+const tags = Array.from(new Set([...featuredTags, ...tagCounts.keys()]));
 ---
 
-<Layout title="文章列表">
-  <h1>文章列表</h1>
-  <ul class="post-list">
-    {posts.map((post) => (
-      <li>
-        <a href={`/blog/${post.slug}/`}>
-          <h2>{post.data.title}</h2>
-          <p>{post.data.description}</p>
-          <time>{post.data.pubDate.toLocaleDateString('zh-CN')}</time>
-        </a>
-      </li>
-    ))}
-  </ul>
+<Layout title="文章列表" description="计算力学、复合材料建模、边坡动力响应与目标跟踪相关笔记。">
+  <section class="page-intro">
+    <p class="eyebrow">Notebook Archive</p>
+    <h1 class="page-title">文章列表</h1>
+    <p class="lede">
+      按时间整理项目记录、方法说明和论文阅读。每篇文章都尽量保留问题背景、实现路径和可以复用的工程细节。
+    </p>
+    <nav class="tag-board" aria-label="文章标签">
+      {
+        tags.map((tag) => (
+          <a href={getTagHref(tag)} class:list={['tag-chip', { featured: tag === dailyPaperTag }]}>
+            {tag}
+            <span>{tagCounts.get(tag) ?? 0}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+
+  <section class="archive" aria-label="文章归档">
+    {
+      posts.map((post, index) => (
+        <article class="archive-card">
+          <a href={getBlogHref(post)}>
+            <span class="archive-index">{String(index + 1).padStart(2, '0')}</span>
+            <div class="archive-body">
+              <time datetime={post.data.pubDate.toISOString()} data-timestamp={getTimestamp(post.data.pubDate)}>
+                {getFallbackTime(post.data.pubDate)}
+              </time>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+              {
+                getPostTags(post).length > 0 && (
+                  <div class="tag-list" aria-label={`${post.data.title} 标签`}>
+                    {getPostTags(post).map((tag) => (
+                      <span class:list={['tag-chip', { featured: tag === dailyPaperTag }]}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )
+              }
+            </div>
+          </a>
+        </article>
+      ))
+    }
+  </section>
 </Layout>
 
 <style>
-  h1 {
-    margin-bottom: 2rem;
+  .archive {
+    display: grid;
+    gap: 0.85rem;
   }
 
-  .post-list {
-    list-style: none;
-    padding: 0;
+  .tag-board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.35rem;
   }
 
-  .post-list li {
-    margin-bottom: 1.5rem;
+  .tag-board .tag-chip {
+    gap: 0.42rem;
   }
 
-  .post-list a {
-    display: block;
-    padding: 1.5rem;
+  .tag-board span {
+    min-width: 1.35rem;
+    min-height: 1.35rem;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--text) 9%, transparent);
+    color: var(--text-secondary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+  }
+
+  .archive-card a {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.1rem;
     border: 1px solid var(--border);
-    border-radius: 12px;
-    text-decoration: none;
+    border-radius: var(--radius);
+    background:
+      linear-gradient(120deg, rgba(255, 255, 255, 0.38), transparent),
+      var(--surface);
     color: inherit;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    transition:
+      transform 180ms var(--ease),
+      border-color 180ms var(--ease),
+      box-shadow 180ms var(--ease),
+      background 180ms var(--ease);
   }
 
-  .post-list a:hover {
+  .archive-card a:hover {
+    transform: translateY(-2px);
     border-color: var(--accent);
-    box-shadow: 0 4px 12px rgba(136, 58, 234, 0.1);
+    background: var(--surface-strong);
+    box-shadow: var(--shadow-soft);
   }
 
-  .post-list h2 {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
+  .archive-index {
+    width: 3.1rem;
+    height: 3.1rem;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
     color: var(--accent);
+    background: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 800;
+    line-height: 1;
   }
 
-  .post-list p {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    margin-bottom: 0.75rem;
+  .archive-body {
+    min-width: 0;
   }
 
-  .post-list time {
-    font-size: 0.875rem;
+  .archive-body time {
+    color: var(--text-soft);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+  }
+
+  .archive-body h2 {
+    margin-top: 0.2rem;
+    color: var(--text);
+    font-size: clamp(1.14rem, 2.4vw, 1.55rem);
+    line-height: 1.32;
+    overflow-wrap: anywhere;
+  }
+
+  .archive-body p {
+    margin-top: 0.5rem;
     color: var(--text-secondary);
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  .archive-body .tag-list {
+    margin-top: 0.8rem;
+  }
+
+  @media (max-width: 560px) {
+    .archive-card a {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
+
+    .archive-index {
+      width: fit-content;
+      height: auto;
+      padding: 0.35rem 0.55rem;
+    }
   }
 </style>

@@ -1,0 +1,154 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { dailyPaperTag, getTagMeta } from '../../data/tags';
+import { getBlogHref, getFallbackTime, getTagHref, getTimestamp, isPublished, sortPosts } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const allPosts = sortPosts((await getCollection('blog')).filter(isPublished));
+  const allTags = Array.from(
+    new Set(allPosts.flatMap((post) => post.data.tags ?? []))
+  );
+
+  return allTags.map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: allPosts.filter((post) => (post.data.tags ?? []).includes(tag)),
+    },
+  }));
+}
+
+interface Props {
+  tag: string;
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { tag, posts } = Astro.props;
+const tagMeta = getTagMeta(tag);
+---
+
+<Layout title={`${tag} - 标签`} description={tagMeta?.description ?? `${tag} 标签下的文章归档。`}>
+  <section class="page-intro">
+    <p class="eyebrow">Tag Archive</p>
+    <h1 class="page-title">{tag}</h1>
+    <p class="lede">
+      {
+        posts.length > 0
+          ? `共 ${posts.length} 篇文章归入这个标签。`
+          : '这个标签还在等第一篇记录。'
+      }
+    </p>
+    <div class="tag-list" aria-label="当前标签">
+      <a href={getTagHref(tag)} class:list={['tag-chip', { featured: tag === dailyPaperTag }]}>
+        {tag}
+      </a>
+    </div>
+  </section>
+
+  {
+    posts.length > 0 ? (
+      <section class="tag-archive" aria-label={`${tag} 标签文章`}>
+        {posts.map((post, index) => (
+          <article class="tag-card">
+            <a href={getBlogHref(post)}>
+              <span class="tag-index">{String(index + 1).padStart(2, '0')}</span>
+              <div>
+                <time datetime={post.data.pubDate.toISOString()} data-timestamp={getTimestamp(post.data.pubDate)}>
+                  {getFallbackTime(post.data.pubDate)}
+                </time>
+                <h2>{post.data.title}</h2>
+                <p>{post.data.description}</p>
+              </div>
+            </a>
+          </article>
+        ))}
+      </section>
+    ) : (
+      <p class="empty-state">后续日报内容会出现在这里。</p>
+    )
+  }
+</Layout>
+
+<style>
+  .tag-archive {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .tag-card a {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(120deg, rgba(255, 255, 255, 0.38), transparent),
+      var(--surface);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      transform 180ms var(--ease),
+      border-color 180ms var(--ease),
+      box-shadow 180ms var(--ease),
+      background 180ms var(--ease);
+  }
+
+  .tag-card a:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    background: var(--surface-strong);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .tag-index {
+    width: 3.1rem;
+    height: 3.1rem;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .tag-card time {
+    color: var(--text-soft);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+  }
+
+  .tag-card h2 {
+    margin-top: 0.2rem;
+    color: var(--text);
+    font-size: clamp(1.14rem, 2.4vw, 1.55rem);
+    line-height: 1.32;
+    overflow-wrap: anywhere;
+  }
+
+  .tag-card p {
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 560px) {
+    .tag-card a {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
+
+    .tag-index {
+      width: fit-content;
+      height: auto;
+      padding: 0.35rem 0.55rem;
+    }
+  }
+</style>

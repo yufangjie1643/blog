@@ -1,7 +1,12 @@
 ---
 title: '基于模态叠加法的边坡地震响应分析'
 description: '介绍二维有限元模态叠加法在边坡地震动力分析中的应用与实现。'
-pubDate: '2025-05-02'
+pubDate: 1746147600
+slug: 'slope-seismic-modal-superposition'
+aliases: ['second-post']
+category: '项目笔记'
+series: '工程分析工具'
+tags: ['边坡工程', '地震响应', '模态叠加法', '有限元']
 ---
 
 边坡在地震作用下的稳定性评价是岩土工程防灾减灾的重要课题。我开发的 **bianpokangzheng** 工具采用二维有限元模态叠加法，实现了边坡地震响应的高效分析。

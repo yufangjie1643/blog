@@ -1,7 +1,12 @@
 ---
 title: 'SUTrack：面向简单且统一的多模态单目标跟踪'
 description: '介绍 AAAI 2025 录用论文 SUTrack 的核心思想与性能表现。'
-pubDate: '2025-05-06'
+pubDate: 1746493200
+slug: 'sutrack'
+aliases: ['sutrack-readme']
+category: '论文阅读'
+series: '目标跟踪'
+tags: ['目标跟踪', '计算机视觉', '深度学习']
 ---
 
 > 论文：[SUTrack: Towards Simple and Unified Single Object Tracking](https://ojs.aaai.org/index.php/AAAI/article/view/32223) (AAAI 2025)

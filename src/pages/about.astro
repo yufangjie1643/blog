@@ -1,132 +1,242 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const researchItems = [
+  {
+    title: '复合材料损伤力学',
+    text: '基于体素（Voxel）的各向异性连续损伤力学（CDM）建模，谱有限元方法，多尺度渐进失效分析。',
+  },
+  {
+    title: '编织复合材料建模',
+    text: 'TexGen 几何建模，2D/3D 编织结构，体素/四面体网格生成，Abaqus/ANSYS 有限元分析接口。',
+  },
+  {
+    title: '边坡地震响应分析',
+    text: '基于二维有限元模态叠加法的边坡抗震性能评估。',
+  },
+  {
+    title: '计算机视觉',
+    text: '目标跟踪算法，Siamese Network 与 Transformer-based Trackers。',
+  },
+];
+
+const tags = ['计算力学', '有限元方法', '复合材料', 'Python', 'Abaqus'];
 ---
 
-<Layout title="关于">
-  <section class="profile">
-    <div class="avatar">🔬</div>
-    <h1>关于我</h1>
-    <p class="subtitle">力学研究生 · 计算力学与复合材料方向</p>
-  </section>
-
-  <section class="info">
-    <h2>教育背景</h2>
-    <div class="card">
-      <h3>西南交通大学</h3>
-      <p>力学与航空航天学院 · 力学专业 · 硕士研究生在读</p>
-      <p class="tags">
-        <span>计算力学</span>
-        <span>有限元方法</span>
-        <span>复合材料</span>
+<Layout title="关于" description="yufangjie1643 的研究背景、方向和联系方式。">
+  <section class="about-hero">
+    <div class="profile-mark" aria-hidden="true">
+      <span>FJ</span>
+    </div>
+    <div class="about-copy">
+      <p class="eyebrow">About</p>
+      <h1 class="page-title">关于我</h1>
+      <p class="lede">
+        力学研究生，关注计算力学、复合材料损伤、纺织结构建模和工程分析软件化。这个博客是我的研究日志和开源项目索引。
       </p>
     </div>
   </section>
 
-  <section class="research">
-    <h2>研究方向</h2>
-    <ul>
-      <li><strong>复合材料损伤力学</strong>：基于体素（Voxel）的各向异性连续损伤力学（CDM）建模，谱有限元方法，多尺度渐进失效分析</li>
-      <li><strong>纺织复合材料建模</strong>：TexGen 几何建模，2D/3D 编织结构，体素/四面体网格生成，Abaqus/ANSYS 有限元分析接口</li>
-      <li><strong>边坡地震响应分析</strong>：基于二维有限元模态叠加法的边坡抗震性能评估</li>
-      <li><strong>计算机视觉</strong>：目标跟踪算法（Siamese Network、Transformer-based Trackers）</li>
-    </ul>
+  <section class="about-grid" aria-label="个人信息">
+    <article class="about-block education">
+      <p class="block-label">Education</p>
+      <h2>西南交通大学</h2>
+      <p>力学与航空航天学院 · 力学专业 · 硕士研究生在读</p>
+      <div class="tags">
+        {tags.map((tag) => <span>{tag}</span>)}
+      </div>
+    </article>
+
+    <article class="about-block contact">
+      <p class="block-label">Contact</p>
+      <h2>联系方式</h2>
+      <ul>
+        <li>
+          GitHub：
+          <a href="https://github.com/yufangjie1643" target="_blank" rel="noopener">@yufangjie1643</a>
+        </li>
+        <li>学校：西南交通大学 · 力学与航空航天学院</li>
+      </ul>
+    </article>
   </section>
 
-  <section class="contact">
-    <h2>联系方式</h2>
-    <ul>
-      <li>GitHub：<a href="https://github.com/yufangjie1643" target="_blank" rel="noopener">@yufangjie1643</a></li>
-      <li>学校：西南交通大学 · 力学与航空航天学院</li>
-    </ul>
+  <section class="research-section" aria-labelledby="research-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Research Map</p>
+        <h2 id="research-title">研究方向</h2>
+      </div>
+      <p>目前的工作更偏向“模型 - 算法 - 工具”的连续链路，目标是让计算过程更可追踪、可复用。</p>
+    </div>
+    <div class="research-list">
+      {
+        researchItems.map((item, index) => (
+          <article>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
   </section>
 </Layout>
 
 <style>
-  .profile {
-    text-align: center;
-    padding: 2rem 0;
+  .about-hero {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: clamp(1.2rem, 4vw, 2.4rem);
+    align-items: end;
+    margin-bottom: clamp(2rem, 6vw, 4rem);
   }
 
-  .avatar {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-
-  .profile h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-  }
-
-  section {
-    margin-bottom: 2.5rem;
-  }
-
-  h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-    color: var(--accent);
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 0.5rem;
-  }
-
-  .card {
-    background: var(--bg-secondary);
+  .profile-mark {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
+    border-radius: var(--radius);
+    background:
+      radial-gradient(circle at 72% 26%, rgba(27, 117, 111, 0.18), transparent 36%),
+      repeating-linear-gradient(
+        -35deg,
+        transparent 0,
+        transparent 12px,
+        rgba(184, 91, 43, 0.08) 12px,
+        rgba(184, 91, 43, 0.08) 13px
+      ),
+      var(--surface);
+    box-shadow: var(--shadow-soft);
   }
 
-  .card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
+  .profile-mark span {
+    color: var(--accent);
+    font-family: ui-serif, "Songti SC", Georgia, serif;
+    font-size: clamp(3.5rem, 9vw, 5.8rem);
+    line-height: 1;
   }
 
-  .card p {
+  .about-copy {
+    min-width: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+    gap: 1rem;
+    margin-bottom: clamp(2.4rem, 6vw, 4rem);
+  }
+
+  .about-block {
+    min-width: 0;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .block-label {
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .about-block h2 {
+    margin-top: 0.65rem;
+    font-size: clamp(1.28rem, 2.5vw, 1.7rem);
+    line-height: 1.25;
+  }
+
+  .about-block p,
+  .about-block li {
+    margin-top: 0.55rem;
     color: var(--text-secondary);
-    font-size: 0.95rem;
-    margin-bottom: 0.75rem;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  .contact ul {
+    list-style: none;
+    padding: 0;
   }
 
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0.45rem;
+    margin-top: 1rem;
   }
 
   .tags span {
-    background: var(--accent);
-    color: white;
-    font-size: 0.8rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding: 0.22rem 0.58rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--accent-2);
+    background: color-mix(in srgb, var(--bg-elevated) 76%, transparent);
+    font-size: 0.78rem;
   }
 
-  ul {
-    padding-left: 1.5rem;
+  .research-list {
+    display: grid;
+    gap: 0.75rem;
   }
 
-  li {
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-    line-height: 1.7;
+  .research-list article {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 3.4rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
   }
 
-  strong {
+  .research-list span {
     color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 800;
   }
 
-  a {
-    color: var(--accent);
-    text-decoration: none;
+  .research-list h3 {
+    font-size: 1.1rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 
-  a:hover {
-    text-decoration: underline;
+  .research-list p {
+    margin-top: 0.35rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 800px) {
+    .about-hero,
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .profile-mark {
+      width: min(13rem, 58vw);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .research-list article {
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+    }
   }
 </style>

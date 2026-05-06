@@ -1,168 +1,460 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { dailyPaperTag } from '../data/tags';
+import {
+  getBlogHref,
+  getFallbackTime,
+  getPostTags,
+  getTagHref,
+  getTimestamp,
+  isPublished,
+  sortPosts,
+} from '../lib/content';
 
-const posts = (await getCollection('blog')).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const posts = sortPosts((await getCollection('blog')).filter(isPublished));
+const projects = await getCollection('projects');
+
+const latestPosts = posts.slice(0, 4);
+
+const focusAreas = [
+  {
+    label: 'Composite Damage',
+    title: '复合材料损伤力学',
+    text: '围绕体素建模、各向异性连续损伤力学和多尺度渐进失效，沉淀可复现的计算流程。',
+  },
+  {
+    label: 'Textile Modeling',
+    title: '纺织结构几何建模',
+    text: '基于 TexGen 与 Python 绑定，连接编织结构、网格生成和 Abaqus/ANSYS 前处理。',
+  },
+  {
+    label: 'Seismic Response',
+    title: '边坡动力响应分析',
+    text: '用二维有限元和模态叠加法分析地震作用下的动力放大与稳定性问题。',
+  },
+];
+
+const stats = [
+  { value: posts.length.toString(), label: '篇研究笔记' },
+  { value: projects.length.toString(), label: '个开源项目' },
+  { value: '4', label: '条研究线索' },
+];
 ---
 
-<Layout title="首页">
-  <section class="hero">
-    <div class="avatar">🔬</div>
-    <h1>yufangjie1643</h1>
-    <p class="tagline">西南交通大学 · 力学与航空航天学院</p>
-    <p class="desc">计算力学 | 复合材料损伤力学 | 纺织结构建模 | 边坡抗震分析</p>
-    <div class="actions">
-      <a href="/projects" class="btn primary">查看项目</a>
-      <a href="/blog" class="btn">阅读文章</a>
+<Layout title="首页" description="yufangjie1643 的个人学术博客，记录计算力学、复合材料建模、边坡动力分析与目标跟踪相关项目。">
+  <section class="home-hero" aria-labelledby="hero-title">
+    <div class="hero-visual" aria-hidden="true">
+      <span class="mesh-dot dot-a"></span>
+      <span class="mesh-dot dot-b"></span>
+      <span class="mesh-dot dot-c"></span>
+      <span class="signal-line line-a"></span>
+      <span class="signal-line line-b"></span>
+    </div>
+    <div class="hero-content">
+      <p class="eyebrow">Mechanics · Composite · Code</p>
+      <h1 id="hero-title">把计算力学、复合材料建模与开源笔记放在同一个工作台。</h1>
+      <p class="lede">
+        我关注力学问题的数值建模、编织复合材料前处理和工程分析工具化。这里记录项目进展、论文阅读、算法实现与踩坑笔记。
+      </p>
+      <div class="button-row">
+        <a href="/projects" class="button primary">查看项目</a>
+        <a href="/blog" class="button subtle">阅读文章</a>
+      </div>
+      <div class="quick-tags" aria-label="快捷标签">
+        <a href={getTagHref(dailyPaperTag)} class="tag-chip featured">{dailyPaperTag}</a>
+      </div>
+    </div>
+    <dl class="hero-stats" aria-label="博客概览">
+      {
+        stats.map((item) => (
+          <div>
+            <dt>{item.value}</dt>
+            <dd>{item.label}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="focus-section" aria-labelledby="focus-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Research Tracks</p>
+        <h2 id="focus-title">研究主线</h2>
+      </div>
+      <p>从理论模型到工程软件，把分散的实验、脚本和报告整理成可回溯的知识库。</p>
+    </div>
+    <div class="focus-grid">
+      {
+        focusAreas.map((area, index) => (
+          <article class="focus-card">
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <p class="card-label">{area.label}</p>
+            <h3>{area.title}</h3>
+            <p>{area.text}</p>
+          </article>
+        ))
+      }
     </div>
   </section>
 
-  <section class="posts">
-    <div class="section-header">
-      <h2>最新文章</h2>
-      <a href="/blog" class="more">查看全部 →</a>
+  <section class="latest-section" aria-labelledby="latest-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Latest Notes</p>
+        <h2 id="latest-title">最新文章</h2>
+      </div>
+      <a href="/blog" class="button">全部文章</a>
     </div>
-    <ul>
-      {posts.map((post) => (
-        <li>
-          <a href={`/blog/${post.slug}/`}>
-            <span class="title">{post.data.title}</span>
-            <span class="date">
-              {post.data.pubDate.toLocaleDateString('zh-CN')}
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
+    <div class="latest-list">
+      {
+        latestPosts.map((post) => (
+          <article class="post-row">
+            <a href={getBlogHref(post)}>
+              <div>
+                <time datetime={post.data.pubDate.toISOString()} data-timestamp={getTimestamp(post.data.pubDate)}>
+                  {getFallbackTime(post.data.pubDate)}
+                </time>
+                <h3>{post.data.title}</h3>
+                {
+                  getPostTags(post).length > 0 && (
+                    <div class="tag-list" aria-label={`${post.data.title} 标签`}>
+                      {getPostTags(post).map((tag) => (
+                        <span class:list={['tag-chip', { featured: tag === dailyPaperTag }]}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )
+                }
+              </div>
+              <p>{post.data.description}</p>
+            </a>
+          </article>
+        ))
+      }
+    </div>
   </section>
 </Layout>
 
 <style>
-  .hero {
-    text-align: center;
-    padding: 3rem 0 2rem;
-  }
-
-  .avatar {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-
-  .hero h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .tagline {
-    color: var(--accent);
-    font-weight: 500;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .desc {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    padding: 0.6rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.2s;
+  .home-hero {
+    position: relative;
+    isolation: isolate;
+    min-height: min(680px, calc(100vh - 8rem));
+    display: grid;
+    align-content: end;
+    gap: clamp(2rem, 6vw, 4rem);
+    padding: clamp(3.4rem, 10vw, 7rem) clamp(1.15rem, 5vw, 4rem) clamp(1.2rem, 4vw, 2rem);
     border: 1px solid var(--border);
-    color: var(--text);
-    background: var(--bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background:
+      linear-gradient(120deg, rgba(255, 250, 241, 0.92), rgba(255, 250, 241, 0.55)),
+      radial-gradient(circle at 82% 18%, rgba(27, 117, 111, 0.22), transparent 18rem),
+      radial-gradient(circle at 16% 86%, rgba(184, 91, 43, 0.2), transparent 20rem),
+      var(--bg-elevated);
+    box-shadow: var(--shadow);
   }
 
-  .btn:hover {
-    border-color: var(--accent);
+  .home-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      linear-gradient(90deg, rgba(23, 33, 29, 0.06) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(23, 33, 29, 0.05) 1px, transparent 1px);
+    background-size: 58px 58px;
+    mask-image: linear-gradient(110deg, black, transparent 74%);
+  }
+
+  .home-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -8% 8% 40%;
+    height: 42%;
+    z-index: -1;
+    border-top: 1px solid rgba(27, 117, 111, 0.32);
+    border-bottom: 1px solid rgba(184, 91, 43, 0.28);
+    transform: rotate(-10deg);
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(27, 117, 111, 0.1) 0,
+        rgba(27, 117, 111, 0.1) 2px,
+        transparent 2px,
+        transparent 18px
+      );
+    opacity: 0.85;
+  }
+
+  .hero-content {
+    max-width: 58rem;
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  .hero-content h1 {
+    max-width: 12.5ch;
+    font-family: ui-serif, "Songti SC", "Noto Serif CJK SC", Georgia, serif;
+    font-size: clamp(2.4rem, 8vw, 5.8rem);
+    line-height: 0.98;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-content .lede {
+    max-width: 46rem;
+  }
+
+  .quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .hero-visual {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .mesh-dot {
+    position: absolute;
+    width: clamp(4rem, 9vw, 7.2rem);
+    aspect-ratio: 1;
+    border: 1px solid color-mix(in srgb, var(--accent-2) 56%, transparent);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgba(27, 117, 111, 0.18) 0 8%, transparent 9%),
+      repeating-linear-gradient(45deg, transparent 0 8px, rgba(27, 117, 111, 0.08) 8px 9px);
+  }
+
+  .dot-a {
+    right: 12%;
+    top: 16%;
+  }
+
+  .dot-b {
+    right: 24%;
+    bottom: 24%;
+    width: clamp(3rem, 7vw, 5rem);
+    border-color: color-mix(in srgb, var(--accent) 54%, transparent);
+  }
+
+  .dot-c {
+    left: 8%;
+    bottom: 14%;
+    width: clamp(2.6rem, 5vw, 4rem);
+  }
+
+  .signal-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
+    transform-origin: center;
+    opacity: 0.6;
+  }
+
+  .line-a {
+    width: 48%;
+    right: 4%;
+    top: 38%;
+    transform: rotate(-24deg);
+  }
+
+  .line-b {
+    width: 36%;
+    right: 22%;
+    bottom: 28%;
+    transform: rotate(16deg);
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .hero-stats div {
+    padding: clamp(0.9rem, 2vw, 1.2rem);
+    background: color-mix(in srgb, var(--surface-strong) 84%, transparent);
+  }
+
+  .hero-stats dt {
+    font-family: ui-serif, "Songti SC", Georgia, serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1;
     color: var(--accent);
   }
 
-  .btn.primary {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-  }
-
-  .btn.primary:hover {
-    background: var(--accent-light);
-    border-color: var(--accent-light);
-  }
-
-  .posts {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .section-header h2 {
-    font-size: 1.25rem;
+  .hero-stats dd {
+    margin-top: 0.28rem;
     color: var(--text-secondary);
+    font-size: 0.88rem;
   }
 
-  .more {
-    font-size: 0.9rem;
+  .focus-section,
+  .latest-section {
+    margin-top: clamp(2.6rem, 7vw, 4.8rem);
+  }
+
+  .focus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .focus-card {
+    min-width: 0;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.36), transparent),
+      var(--surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .focus-card > span {
     color: var(--accent);
-    text-decoration: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 800;
+    font-size: 0.78rem;
   }
 
-  .more:hover {
-    text-decoration: underline;
+  .card-label {
+    margin-top: 1.4rem;
+    color: var(--text-soft);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
   }
 
-  .posts ul {
-    list-style: none;
-    padding: 0;
+  .focus-card h3 {
+    margin-top: 0.25rem;
+    font-size: 1.15rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 
-  .posts li {
-    margin-bottom: 0.75rem;
+  .focus-card p:last-child {
+    margin-top: 0.8rem;
+    color: var(--text-secondary);
+    font-size: 0.94rem;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
   }
 
-  .posts a {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .latest-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .post-row a {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(16rem, 1.08fr);
+    gap: 1rem;
     padding: 1rem;
-    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--surface) 84%, transparent);
     color: inherit;
-    border-radius: 8px;
-    transition: background 0.2s;
+    text-decoration: none;
+    transition:
+      transform 180ms var(--ease),
+      border-color 180ms var(--ease),
+      background 180ms var(--ease),
+      box-shadow 180ms var(--ease);
   }
 
-  .posts a:hover {
-    background: var(--bg-secondary);
+  .post-row a:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    background: var(--surface-strong);
+    box-shadow: var(--shadow-soft);
   }
 
-  .posts .title {
-    font-weight: 500;
+  .post-row time {
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.75rem;
   }
 
-  .posts .date {
+  .post-row h3 {
+    margin-top: 0.24rem;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .post-row .tag-list {
+    margin-top: 0.7rem;
+  }
+
+  .post-row p {
     color: var(--text-secondary);
-    font-size: 0.875rem;
-    white-space: nowrap;
-    margin-left: 1rem;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mesh-dot {
+      animation: float-dot 8s var(--ease) infinite alternate;
+    }
+
+    .dot-b {
+      animation-delay: -2s;
+    }
+
+    .dot-c {
+      animation-delay: -4s;
+    }
+
+    @keyframes float-dot {
+      from {
+        transform: translate3d(0, 0, 0);
+      }
+      to {
+        transform: translate3d(0.8rem, -0.7rem, 0);
+      }
+    }
+  }
+
+  @media (max-width: 880px) {
+    .home-hero {
+      min-height: auto;
+    }
+
+    .focus-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .post-row a {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .home-hero {
+      padding: 2.4rem 1rem 1rem;
+    }
+
+    .hero-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(2.2rem, 14vw, 4rem);
+    }
   }
 </style>

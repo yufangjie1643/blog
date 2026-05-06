@@ -1,7 +1,12 @@
 ---
 title: 'SeismicSlope：边坡地震动力放大系数分析系统'
 description: '详细介绍基于二维有限元模态叠加法的边坡地震响应分析桌面工具的设计思路与核心功能。'
-pubDate: '2025-05-04'
+pubDate: 1746320400
+slug: 'seismic-slope'
+aliases: ['bianpokangzheng-readme']
+category: '项目笔记'
+series: '工程分析工具'
+tags: ['边坡工程', '地震响应', '有限元', 'Python']
 ---
 
 > 项目地址：[github.com/yufangjie1643/bianpokangzheng](https://github.com/yufangjie1643/bianpokangzheng)

@@ -1,7 +1,13 @@
 ---
 title: 'Voxel-ACDM：复合材料损伤力学求解器'
 description: '介绍基于体素的各向异性连续损伤力学求解器，用于复合材料多尺度渐进失效分析。'
-pubDate: '2025-05-01'
+pubDate: 1746061200
+slug: 'voxel-acdm'
+aliases: ['first-post']
+category: '项目笔记'
+series: '开源项目'
+tags: ['复合材料', '损伤力学', '谱有限元', '多尺度分析']
+featured: true
 ---
 
 Voxel-ACDM 是我开发的一个基于体素的各向异性连续损伤力学（Anisotropic Continuum Damage Mechanics, ACDM）求解器，专注于复合材料的多尺度渐进失效模拟。
